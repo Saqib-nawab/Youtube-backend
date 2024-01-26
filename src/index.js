@@ -17,6 +17,7 @@ dotenv.config({
 
 // Establishing a connection to the database using the 'connectDB' function and listening the app on port 8000
 connectDB()
+  // the connectDB function is async await and will return an object hence we can use .then and .catch
   .then(() => {
     // Once the database connection is successful, start the server on the specified port or default to 8000
     app.listen(process.env.PORT || 8000, () => {
