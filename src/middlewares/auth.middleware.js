@@ -1,4 +1,5 @@
 //before doing anything to user like logging out, uploading vidoes or something we first need to authenticate using this middleware.
+//this authentication middleware is going to be used multiple times before user performs any functionality
 
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
