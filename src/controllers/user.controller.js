@@ -4,7 +4,7 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
-//this is where we are registering a user
+//this is where we register a user
 const registerUser = asyncHandler(async (req, res) => {
   //steps to register user
   // get user details from frontend
@@ -40,7 +40,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const avatarLocalPath = req.files?.avatar[0]?.path; //uploadoncloudnary takes a path for the avatar
   //const coverImageLocalPath = req.files?.coverImage[0]?.path;
 
-  let coverImageLocalPath;
+  let coverImageLocalPath; //incase if coverImage is missing then make it empty(not unde)
   if (
     req.files &&
     Array.isArray(req.files.coverImage) &&
