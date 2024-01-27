@@ -28,6 +28,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const existedUser = await User.findOne({
+    // user with capital U is a mogoose model and it provides these functions like findOne (remember)
     //if user with the same email or username already exists then throw an error (waited becuase it takes time to check again)
     $or: [{ username }, { email }],
   });
