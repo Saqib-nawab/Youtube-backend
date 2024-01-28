@@ -364,6 +364,88 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "Cover image updated successfully"));
 });
 
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+  // Extract the username from the request parameters
+  const { username } = req.params;
+
+  // Check if the username is provided
+  if (!username?.trim()) {
+    throw new ApiError(400, "username is missing");
+  }
+
+  // Aggregation pipeline to fetch user profile information
+  const channel = await User.aggregate([
+    {
+      // Stage 1: Match documents based on the provided username
+      $match: {
+        username: username?.toLowerCase(),
+      },
+    },
+    {
+      // Stage 2: Lookup to get subscribers
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "channel",
+        as: "subscribers",
+      },
+    },
+    {
+      // Stage 3: Lookup to get channels subscribed to
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "subscriber",
+        as: "subscribedTo",
+      },
+    },
+    {
+      // Stage 4: Add new fields to each document
+      $addFields: {
+        subscribersCount: {
+          $size: "$subscribers",
+        },
+        channelsSubscribedToCount: {
+          $size: "$subscribedTo",
+        },
+        isSubscribed: {
+          $cond: {
+            // Check if the authenticated user is in the subscribers array
+            if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      // Stage 5: Project only the specified fields to the output
+      $project: {
+        fullName: 1,
+        username: 1,
+        subscribersCount: 1,
+        channelsSubscribedToCount: 1,
+        isSubscribed: 1,
+        avatar: 1,
+        coverImage: 1,
+        email: 1,
+      },
+    },
+  ]);
+
+  // Check if the channel array is empty (no matching channel found)
+  if (!channel?.length) {
+    throw new ApiError(404, "channel does not exist");
+  }
+
+  // Respond with the user profile information
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, channel[0], "User channel fetched successfully")
+    );
+});
+
 export {
   registerUser,
   loginUser,
@@ -374,4 +456,5 @@ export {
   updateAccountDetails,
   updateUserAvatar,
   updateUserCoverImage,
+  getUserChannelProfile,
 };
