@@ -41,7 +41,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
 
 const updateTweet = asyncHandler(async (req, res) => {
   try {
-    const tweetId = req.params.id;
+    const tweetId = req.params.id; //http://localhost:8000/api/v1/tweets/65b88f3cc1f61c9051eb466c req.params.id extracts this part from it "65b88f3cc1f61c9051eb466c"
     const { content } = req.body;
 
     const updatedTweet = await Tweet.findByIdAndUpdate(

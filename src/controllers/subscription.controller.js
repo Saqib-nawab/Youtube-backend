@@ -8,7 +8,6 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 const toggleSubscription = asyncHandler(async (req, res) => {
   const { channelId } = req.params;
   const { userId: subscriberId } = req.user; // Assuming user information is available through middleware
-
   // Check if the channelId is a valid ObjectId
   if (!isValidObjectId(channelId)) {
     throw new ApiError(400, "Invalid channelId");
@@ -30,7 +29,11 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 
   if (existingSubscription) {
     // User is already subscribed, so unsubscribe
-    await existingSubscription.remove();
+    await Subscription.deleteOne({
+      channelId,
+      subscriberId,
+    });
+
     res.json({ message: "Unsubscribed successfully" });
   } else {
     // User is not subscribed, so subscribe
@@ -49,11 +52,11 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
   const { channelId } = req.params;
 
   // Check if the channelId is a valid ObjectId
-  if (!isValidObjectId(channelId)) {
-    throw new ApiError(400, "Invalid channelId");
-  }
+  // if (!isValidObjectId(channelId)) {
+  //   throw new ApiError(400, "Invalid channelId");
+  // }
 
-  // TODO: Implement logic to get subscribers of a channel
+  //  Implement logic to get subscribers of a channel
   const subscribers = await Subscription.find({ channelId }).populate(
     "subscriberId",
     "username"
